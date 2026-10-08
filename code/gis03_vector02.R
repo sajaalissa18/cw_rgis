@@ -83,7 +83,7 @@ sf_nc_county_w_area <- sf_nc_county_proj %>%
 
 
 #subset polygons for mapping 
-sf_gi_county1k <- sf_nc_county_w_area %>%
+sf_county1k <- sf_nc_county_w_area %>%
   filter(area > 1000) #1000 km^2
 
 # map the subset of counties
@@ -130,6 +130,10 @@ df_n <- sf_site_join %>%
 
 #3 Subset counties with more than ten sites (ref: Section 3.3)
 #Join df_n to sf_nc_county by using left_join(). Assign the resulting object to sf_n_site.
+
+sf_n_site <- left_join(x = sf_nc_county,
+                       y = df_n)
+
 #From sf_n_site, retain only counties with more than 10 survey sites using dplyr::filter().
 #Assign the subsetted object to sf_n10.
 
