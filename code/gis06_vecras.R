@@ -20,12 +20,12 @@ ggplot() +
   geom_spatraster(data = spr_prec_nc) +
   geom_sf(data = sf_site) + 
   scale_fill_viridis_c() 
-  
+
 
 extract(x = spr_prec_nc,
         y = sf_site,
         bind = TRUE
-  ) %>% 
+) %>% 
   st_as_sf()
 
 ## zonal statistics
@@ -38,8 +38,8 @@ spr_prec_nc_proj <- terra::project(
   x = spr_prec_nc, 
   y = crs(sf_nc_county_proj)
   
-  )
- 
+)
+
 
 ggplot() +
   geom_spatraster(data = spr_prec_nc) +
@@ -47,43 +47,43 @@ ggplot() +
           alpha = 0.25)
 
 df_prec_county <- exact_extract(x = spr_prec_nc_proj,
-              y = sf_nc_county_proj,
-              fun = "mean",
-              append_cols = "county") %>%
+                                y = sf_nc_county_proj,
+                                fun = "mean",
+                                append_cols = "county") %>%
   as_tibble() %>%
   rename(precipitation = mean)
 
 
 sf_nc_county_prec <-sf_nc_county %>% 
-    left_join(df_prec_county,
-              by = "county")
+  left_join(df_prec_county,
+            by = "county")
 
 
 ## visualize the map with precipitation
 ## aes(fill = precipitation)
 
- 
+
 ggplot() +
   geom_sf(data = sf_nc_county_prec,
           aes(fill = precipitation)) +
   scale_fill_viridis_c() +
   theme_bw()
- 
- ## which county has the lowest precipitation 
+
+## which county has the lowest precipitation 
 ## use the arrange () function (unless you have other ideas)
- 
- sf_nc_county_prec %>%
-   arrange(precipitation)
- 
- ## buffer -based analysis
- 
- sf_site_proj <- sf_site %>%
-   st_transform(crs = 32617)
- 
+
+sf_nc_county_prec %>%
+  arrange(precipitation)
+
+## buffer -based analysis
+
+sf_site_proj <- sf_site %>%
+  st_transform(crs = 32617)
+
 sf_site_buff_proj <- sf_site_proj %>%
-   st_buffer(dist = 10000) # createa buffer with 10 km radius
- 
- ## visualize the sf_site_buff_proj and sf_site_proj together
+  st_buffer(dist = 10000) # createa buffer with 10 km radius
+
+## visualize the sf_site_buff_proj and sf_site_proj together
 
 ggplot() +
   geom_sf(data = sf_site_buff_proj) +
@@ -92,7 +92,7 @@ ggplot() +
 df_prec_buff <- exact_extract(
   x = spr_prec_nc_proj,
   y = sf_site_buff_proj,
-   fun = "mean",
+  fun = "mean",
   append_cols = "site_id"
 ) %>%
   as_tibble() %>%
@@ -104,13 +104,13 @@ df_prec_buff <- exact_extract(
 ## combine df_prec_buff with sf_site
 
 sf_site_prec_buff <- sf_site %>% 
-    left_join(
-      df_prec_buff,
-        by ="site_id"
-    )      
-              
+  left_join(
+    df_prec_buff,
+    by ="site_id"
+  )      
+
 ## visualize              
-              
+
 ggplot() +
   geom_sf(data = sf_nc_county) +
   geom_sf(data = sf_site_prec_buff,
@@ -125,12 +125,12 @@ ggplot() +
 # 1010 = crop
 # 1100 = urban
 spr_land <- rast("data/spr_land_reclass.tif")
-              
+
 # 1. reclassify spr_land to binary of crop(1) or elso (0) 
 cm <- cbind(
-c(0, 1001, 1010, 1100),
-c(0, 0, 1, 0)
- )
+  c(0, 1001, 1010, 1100),
+  c(0, 0, 1, 0)
+)
 
 spr_crop <- classify(
   x = spr_land,
@@ -144,30 +144,29 @@ spr_crop_proj <- project(x = spr_crop,
 df_crop <- exact_extract(
   x = spr_crop_proj, # raster layer
   y = sf_nc_county_proj, # mask vector layer
-              fun = "mean", # what summary statistic
-              append_cols = "county" # column for labels
-  ) %>%
+  fun = "mean", # what summary statistic
+  append_cols = "county" # column for labels
+) %>%
   as_tibble() %>%
   rename(frac_crop = mean)
 
 
 # 3. identify the county with the highest crop fraction 
-  arrange(df_crop,desc(frac_crop))
+arrange(df_crop,desc(frac_crop))
 
 
 # 4. for those who are able, visualize the fraction of crop by county 
-  
-  (sf_nc_county_crop <- sf_nc_county %>%
-      left_join(df_crop,
-                by = "county"))
-  
-  ggplot() +
-    geom_sf(data = sf_nc_county_crop,
-            aes(fill = frac_crop)) +
-    scale_fill_viridis_c() +
-    theme_bw()
-  
- 
+
+(sf_nc_county_crop <- sf_nc_county %>%
+    left_join(df_crop,
+              by = "county"))
+
+ggplot() +
+  geom_sf(data = sf_nc_county_crop,
+          aes(fill = frac_crop)) +
+  scale_fill_viridis_c() +
+  theme_bw()
 
 
-  
+
+
