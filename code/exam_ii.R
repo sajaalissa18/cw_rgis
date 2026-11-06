@@ -142,8 +142,8 @@ spr_crop_four <- crop(spr_crop, ext(sf_four))
 
  plot(spr_crop_four)
  
-plot(sf_four, add = TRUE, border"black",
-    col = adjustcolor("white"),alpha.f = 0.3))
+plot(sf_four, add = TRUE, border ="black",
+    col = adjustcolor("white",alpha.f = 0.3))
 
 plot(sf_four)
 
@@ -156,7 +156,7 @@ plot(sf_four)
 # (round your answer to third decimal places, e.g., 0.021)
 
 
-round(mean(values(spr_crop_four), na.rm = TRUE)
+mean(values(spr_crop_four), na.rm = TRUE)
 
 
 
